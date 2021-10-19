@@ -2,7 +2,7 @@ import axios from 'axios';
 import { useState, useEffect } from 'react';
 import './App.css';
 
-const URL = 'http://localhost/todo/index.php'
+const URL = 'http://localhost/todo/'
 
 function App() {
 
@@ -31,7 +31,24 @@ function App() {
       setTasks(tasks => [...tasks,response.data])
       setTask('')
     }).catch (error => {
+      //console.log(error);
       alert(error.response.data.error)
+    })
+  }
+
+  function remove(id) {
+    const json = JSON.stringify({id:id})
+    axios.post(URL + 'delete.php', json,{
+      headers: {
+        'Content-Type' : 'application/json'
+      }
+    })
+    .then((response) => {
+      const newListWithoutRemoved = tasks.filter((item => item.id !== id))
+      setTasks(newListWithoutRemoved)
+    }).catch (error => {
+      //console.log(error);
+      alert(error.response ? error.response.data.error : error)
     })
   }
 
@@ -46,7 +63,11 @@ function App() {
       </form>
      <ol>
       {tasks?.map(task => (
-        <li key={task.id}>{task.description}</li>
+        <li key={task.id}>{task.description}&nbsp;
+        <a href="#" className="delete" onClick={() => remove(task.id)}>
+          Delete
+        </a>
+        </li>
       ))}
      </ol>
     </div>
